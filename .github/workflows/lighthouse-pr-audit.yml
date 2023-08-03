@@ -9,7 +9,7 @@ jobs:
   build_and_preview:
     runs-on: ubuntu-22.04
 
-    
+
 
     steps:
       - uses: aaimio/vercel-preview-url-action@v1
@@ -18,7 +18,7 @@ jobs:
           preview_url_regexp: \[Visit Preview\]\((.*.app)\)
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # - uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
 
       - name: '[Mobile] Audit preview URL with Lighthouse'
