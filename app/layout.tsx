@@ -2,15 +2,15 @@ import "@/styles/globals.css"
 import { Metadata } from "next"
 
 import { siteConfig } from "@/config/site"
-import { fontDisplay, fontSans } from "@/lib/fonts"
-import { SiteFooter } from "@/components/site-footer"
-import { SiteHeader } from "@/components/site-header"
-import { TailwindIndicator } from "@/components/tailwind-indicator"
 
-// import { ThemeProvider } from "@/components/theme-provider"
+import { languages } from "./i18n/settings"
+
+export async function generateStaticParams() {
+  return languages.map((language) => ({ language }))
+}
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://appliedzkp.org"),
+  metadataBase: new URL("https://pse.dev"),
   title: {
     default: siteConfig.name,
     template: `%s - ${siteConfig.name}`,
@@ -25,30 +25,22 @@ export const metadata: Metadata = {
     shortcut: "/favicon.svg",
     apple: "/apple-touch-icon.png",
   },
+  openGraph: {
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+      },
+    ],
+  },
 }
 
 interface RootLayoutProps {
   children: React.ReactNode
+  params?: any
 }
 
-export default function RootLayout({ children }: RootLayoutProps) {
-  return (
-    <>
-      <html
-        lang="en"
-        className={`${fontSans.variable} ${fontDisplay.variable}`}
-        suppressHydrationWarning
-      >
-        <head />
-        <body className={"min-h-screen bg-background antialiased"}>
-          <div className="relative flex min-h-screen flex-col">
-            <SiteHeader />
-            <div className="flex-1">{children}</div>
-            <SiteFooter />
-          </div>
-          <TailwindIndicator />
-        </body>
-      </html>
-    </>
-  )
+export default function RootLayout({ children, params }: RootLayoutProps) {
+  return <>{children}</>
 }

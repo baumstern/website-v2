@@ -1,55 +1,49 @@
-import Link from "next/link"
+"use client"
 
 import { siteConfig } from "@/config/site"
+import { useAppSettings } from "@/hooks/useAppSettings"
 import { MainNav } from "@/components/main-nav"
-import {
-  Discord,
-  Github,
-  Mirror,
-  Twitter,
-} from "@/components/svgs/social-medias"
+import { LocaleTypes, enabledLanguagesItems } from "@/app/i18n/settings"
 
+import { Icons } from "./icons"
 import { SiteHeaderMobile } from "./site-header-mobile"
+import { AppContent } from "./ui/app-content"
+import { Dropdown } from "./ui/dropdown"
 
-export function SiteHeader() {
+type SiteHeaderProps = {
+  lang: LocaleTypes
+}
+
+export function SiteHeader({ lang }: SiteHeaderProps) {
+  const { MAIN_NAV, activeLanguageLabel } = useAppSettings(lang)
+
   return (
-    <header className="sticky top-0 z-40 w-full bg-white px-6 shadow-sm xl:px-20">
-      <div className="flex h-16  justify-between space-x-4 sm:space-x-0">
-        <MainNav items={siteConfig.mainNav} />
-        <SiteHeaderMobile />
-        <div className="hidden flex-1 items-center justify-end space-x-4 md:flex">
-          <nav className="flex items-center gap-5 space-x-1">
-            <Link
-              href={siteConfig.links.twitter}
-              target="_blank"
-              rel="noreferrer"
-            >
-              <Twitter color="black" />
-            </Link>
-            <Link
-              href={siteConfig.links.discord}
-              target="_blank"
-              rel="noreferrer"
-            >
-              <Discord color="black" />
-            </Link>
-            <Link
-              href={siteConfig.links.github}
-              target="_blank"
-              rel="noreferrer"
-            >
-              <Github color="black" />
-            </Link>
-            <Link
-              href={siteConfig.links.articles}
-              target="_blank"
-              rel="noreferrer"
-            >
-              <Mirror color="black" />
-            </Link>
-          </nav>
+    <header className="sticky top-0 z-40 w-full border-b border-tuatara-300 bg-white shadow-sm">
+      <AppContent>
+        <div className="flex h-16 items-center justify-between space-x-4 sm:space-x-0">
+          <MainNav items={MAIN_NAV} lang={lang} />
+          <SiteHeaderMobile lang={lang} />
+          {siteConfig?.showLanguageSwitcher && (
+            <div className="hidden outline-none md:block">
+              <Dropdown
+                label={
+                  <div className="flex items-center gap-1">
+                    <Icons.globe size={22} />
+                    <span className="!text-base !font-normal text-tuatara-950">
+                      {activeLanguageLabel}
+                    </span>
+                  </div>
+                }
+                defaultItem={lang}
+                items={enabledLanguagesItems}
+                onChange={(lang) => {
+                  window?.location?.replace(`/${lang}`)
+                }}
+              />
+            </div>
+          )}
         </div>
-      </div>
+      </AppContent>
     </header>
   )
 }

@@ -3,4 +3,7 @@ export interface NavItem {
   href: string
   disabled?: boolean
   external?: boolean
+  onlyFooter?: boolean
+  onlyHeader?: boolean
+  onlyMobile?: boolean
 }

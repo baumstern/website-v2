@@ -1,89 +1,196 @@
+"use client"
+
 import Image from "next/image"
 import Link from "next/link"
-import PSELogo from "@/public/logos/footer-logo.svg"
 
+import { LangProps } from "@/types/common"
+import { NavItem } from "@/types/nav"
 import { siteConfig } from "@/config/site"
-import {
-  Discord,
-  Github,
-  Mirror,
-  Twitter,
-} from "@/components/svgs/social-medias"
+import { cn } from "@/lib/utils"
+import { useAppSettings } from "@/hooks/useAppSettings"
+import { useTranslation } from "@/app/i18n/client"
 
-import { ArrowRightUp } from "./svgs/arrows"
+import { Icons } from "./icons"
+import { AppContent } from "./ui/app-content"
 
-export function SiteFooter() {
+const ItemLabel = ({
+  label,
+  external = false,
+  icon,
+}: {
+  label: string
+  external?: boolean
+  icon?: React.ReactNode
+}) => {
   return (
-    <footer className="flex flex-col gap-5">
-      <div className="flex w-full flex-col gap-5 p-[32px]">
-        <Image src={PSELogo} alt="logo" width={94} height={41} />
-        <h1 className="text-sm">
-          Privacy + Scaling Explorations is a multidisciplinary team supported
-          by the Ethereum Foundation.
-        </h1>
-      </div>
-      <div className="flex w-full flex-col gap-5 px-[32px] text-base font-medium">
-        <Link href={"/"} className="border-b-2 border-[#171C1B] py-5">
-          HOME
-        </Link>
-        <Link href={"/projects"} className="border-b-2 border-[#171C1B] py-5">
-          PROJECT LIBRARY
-        </Link>
-        <Link
-          href={siteConfig.links.jobs}
-          target="_blank"
-          rel="noreferrer"
-          className="flex items-center gap-5 py-5"
-        >
-          JOBS
-          <ArrowRightUp color="black" />
-        </Link>
-      </div>
-      <div className="flex w-full flex-col items-center justify-center gap-5 bg-[#171C1B] py-[40px] text-sm">
-        <div className="flex gap-5">
-          <Link
-            href={siteConfig.links.twitter}
-            target="_blank"
-            rel="noreferrer"
-          >
-            <Twitter color="white" />
-          </Link>
+    <div className="group flex items-center gap-2">
+      {external && (
+        <Icons.externalUrl className="w-5 duration-200 group-hover:text-orange" />
+      )}
+      {icon && <div className="group-hover:text-orange">{icon}</div>}
+      <span className="mt-[0.9px] font-sans text-sm font-normal uppercase leading-[21px] text-white duration-200 group-hover:text-orange md:block">
+        {label}
+      </span>
+    </div>
+  )
+}
 
-          <Link
-            href={siteConfig.links.discord}
-            target="_blank"
-            rel="noreferrer"
-          >
-            <Discord color="white" />
-          </Link>
-          <Link href={siteConfig.links.github} target="_blank" rel="noreferrer">
-            <Github color="white" />
-          </Link>
-          <Link
-            href={siteConfig.links.articles}
-            target="_blank"
-            rel="noreferrer"
-          >
-            <Mirror color="white" />
-          </Link>
-        </div>
-        <div className="flex gap-5 text-white">
-          <Link
-            href={siteConfig.links.privacyPolicy}
-            target="_blank"
-            rel="noreferrer"
-          >
-            <h1>Privacy Policy</h1>
-          </Link>
-          <Link
-            href={siteConfig.links.termOfUse}
-            target="_blank"
-            rel="noreferrer"
-          >
-            <h1>Terms of use</h1>
-          </Link>
-        </div>
-        <h1 className="text-gray-400">Last updated June 8, 2023</h1>
+const LinksWrapper = ({
+  children,
+  className,
+}: {
+  children: React.ReactNode
+  className?: string
+}) => {
+  return <div className={cn("flex flex-col gap-4", className)}>{children}</div>
+}
+
+export function SiteFooter({ lang }: LangProps["params"]) {
+  const { t } = useTranslation(lang, "common")
+
+  const { MAIN_NAV } = useAppSettings(lang)
+
+  return (
+    <footer className="flex flex-col">
+      <div className="bg-tuatara-950 py-8 text-left text-[14px] text-white">
+        <AppContent className="grid grid-cols-1 justify-between gap-10 bg-tuatara-950 py-2 text-white lg:grid-cols-[400px_1fr] lg:gap-24">
+          <div className="order-1 flex flex-col items-center gap-4 md:flex-row md:gap-8">
+            <Image
+              width={140}
+              height={140}
+              src="/logos/pse-logo-circle-white.svg"
+              alt="logo PSE"
+              className="h-36 w-36"
+            />
+            <span className="text-center font-sans text-sm leading-[21px] md:text-left">
+              {t("footer.description")}
+            </span>
+          </div>
+          <div className="order-2 grid grid-cols-1 justify-between gap-10 uppercase lg:grid-cols-4 lg:gap-0">
+            <LinksWrapper>
+              {MAIN_NAV.map(
+                (
+                  { title, href, external = false, onlyHeader }: NavItem,
+                  indexKey
+                ) =>
+                  !onlyHeader && (
+                    <Link
+                      key={indexKey}
+                      href={href}
+                      target={external ? "_blank" : undefined}
+                    >
+                      <ItemLabel label={title} />
+                    </Link>
+                  )
+              )}
+            </LinksWrapper>
+            <LinksWrapper>
+              <Link
+                href={siteConfig.links.articles}
+                className="flex items-center gap-2"
+                target="_blank"
+                rel="noreferrer"
+              >
+                <ItemLabel label="Blog" external />
+              </Link>
+              <Link
+                href={siteConfig.links.jobs}
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center gap-2"
+              >
+                <ItemLabel label={t("menu.jobs")} external />
+              </Link>
+              <Link
+                href={siteConfig.links.report}
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center gap-2"
+              >
+                <ItemLabel label={t("menu.report")} external />
+              </Link>
+              <Link
+                href={siteConfig.links.firstGoodIssue}
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center gap-2"
+              >
+                <ItemLabel label={t("menu.firstGoodIssue")} external />
+              </Link>
+            </LinksWrapper>
+            <LinksWrapper>
+              <Link
+                href={siteConfig.links.discord}
+                className="flex items-start gap-2"
+                target="_blank"
+                rel="noreferrer"
+              >
+                <ItemLabel
+                  label="Discord"
+                  icon={<Icons.discord className="w-4" />}
+                />
+              </Link>
+              <Link
+                href={siteConfig.links.github}
+                className="flex items-start gap-2"
+                target="_blank"
+                rel="noreferrer"
+              >
+                <ItemLabel
+                  label="Github"
+                  icon={<Icons.gitHub className="w-4" />}
+                />
+              </Link>
+              <Link
+                href={siteConfig.links.twitter}
+                className="flex items-center gap-2"
+                target="_blank"
+                rel="noreferrer"
+              >
+                <ItemLabel
+                  label="Twitter"
+                  icon={
+                    <div className="w-4">
+                      <Icons.twitter className="w-full" />
+                    </div>
+                  }
+                />
+              </Link>
+
+              <Link
+                href={siteConfig.links.youtube}
+                className="flex items-center gap-2"
+                target="_blank"
+                rel="noreferrer"
+              >
+                <ItemLabel
+                  label="Youtube"
+                  icon={
+                    <div className="w-4">
+                      <Icons.youtube className="w-full" />
+                    </div>
+                  }
+                />
+              </Link>
+            </LinksWrapper>
+            <LinksWrapper>
+              <Link
+                href={siteConfig.links.privacyPolicy}
+                target="_blank"
+                rel="noreferrer"
+              >
+                <ItemLabel label={t("footer.privacyPolicy")} />
+              </Link>
+              <Link
+                href={siteConfig.links.termOfUse}
+                target="_blank"
+                rel="noreferrer"
+              >
+                <ItemLabel label={t("footer.termsOfUse")} />
+              </Link>
+            </LinksWrapper>
+          </div>
+        </AppContent>
       </div>
     </footer>
   )
